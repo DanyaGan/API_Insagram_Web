@@ -101,6 +101,7 @@ class stalker:
                 'status': r.status_code
             }
     
+    
 
 bot = stalker()
 bot.user_name = 'instagram'
