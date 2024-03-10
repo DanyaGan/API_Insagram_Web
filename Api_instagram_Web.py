@@ -1,20 +1,21 @@
 import requests
 
-import data # headers, cookies
-
     
 class stalker:
     def __init__(self):
         self.url = 'https://www.instagram.com/api/v1'
         self.user_id: int
 
+        self.headers: dict
+        self.cookies: any
+
     def get_info_profile(self):
         params = {'username': self.user_name}
 
         r = requests.get(f'{self.url}/users/web_profile_info/',
             params=params,
-            cookies=data.cookies,
-            headers=data.headers_info,
+            cookies=self.cookies,
+            headers=self.headers,
         )
         if r.status_code == 200:
             r = r.json()
@@ -45,8 +46,8 @@ class stalker:
 
         r = requests.get(f'{self.url}/feed/user/{self.user_name}/username/',
             params=params,
-            cookies=data.cookies,
-            headers=data.headers_post,
+            cookies=self.cookies,
+            headers=self.headers,
         )
         if r.status_code == 200:
             r = r.json()
@@ -73,8 +74,8 @@ class stalker:
     
     def get_reel(self):
         r = requests.get(f'{self.url}/feed/reels_media/?reel_ids={self.user_id}',
-            cookies=data.cookies,
-            headers=data.headers_info,
+            cookies=self.cookies,
+            headers=self.headers,
         )
         if r.status_code == 200:
             r = r.json()
@@ -83,7 +84,13 @@ class stalker:
                     'status': r['status'],
                     'items': []
                 }
+                print(r)
                 
+                if not r['reels']:
+                    return {
+                        'status': 'unknown issue'
+                    }
+
                 for reel in r['reels'][self.user_id]['items']:
                     reels['items'].append({
                         'id': reel['id'],
@@ -101,11 +108,3 @@ class stalker:
                 'status': r.status_code
             }
     
-    
-
-bot = stalker()
-bot.user_name = 'instagram'
-bot.user_id = bot.get_info_profile()['id']
-print(bot.user_id)
-profile_info = bot.get_reel()
-print(profile_info)
