@@ -12,12 +12,10 @@ class stalker:
     def get_info_profile(self):
         params = {'username': self.user_name}
 
-        r = requests.get(f'{self.url}/users/web_profile_info/',
-            params=params,
-            cookies=self.cookies,
-            headers=self.headers,
-        )
+        r = requests.get(f'{self.url}/users/web_profile_info/', params=params, cookies=self.cookies, headers=self.headers)
+
         if r.status_code == 200:
+            
             r = r.json()
             if r['status'] == 'ok':
                 return {
@@ -41,7 +39,7 @@ class stalker:
                 'status': r.status_code
             }
 
-    def get_post(self, end_cursor):
+    def get_post(self, end_cursor=''):
         data = {
             'av': '17841464967642321',
             '__d': 'www',
@@ -70,16 +68,17 @@ class stalker:
             'doc_id': '7094391783991078',
         }
 
-        response = requests.post('https://www.instagram.com/api/graphql', cookies=self.cookies, headers=self.headers_info, data=data)
+        response = requests.post('https://www.instagram.com/api/graphql', cookies=self.cookies, headers=self.headers, data=data)
+
         if response.status_code == 200:
+            
             response = response.json()
             if response['extensions']['is_final']:
                 posts = {
-                    'items': []
+                    'status': 'ok' if response['extensions']['is_final'] else 'Error',
+                    'end_cursor': response['data']['xdt_api__v1__feed__user_timeline_graphql_connection']['page_info']['end_cursor'],
+                    'items': [],
                 }
-
-                posts['status'] = 'ok' if response['extensions']['is_final'] else 'Error'
-                posts['end_cursor'] = response['data']['xdt_api__v1__feed__user_timeline_graphql_connection']['page_info']['end_cursor']
                 
                 for post in response['data']['xdt_api__v1__feed__user_timeline_graphql_connection']['edges']:
                     posts['items'].append({
@@ -109,11 +108,11 @@ class stalker:
         if r.status_code == 200:
             r = r.json()
             if r['status'] == 'ok':
+
                 reels = {
                     'status': r['status'],
                     'items': []
                 }
-                print(r)
                 
                 if not r['reels']:
                     return {
@@ -127,7 +126,6 @@ class stalker:
                     })
 
                 return reels
-            
             else:
                 return {
                     'status': r['status']
@@ -137,3 +135,41 @@ class stalker:
                 'status': r.status_code
             }
     
+    def list_popular_history(self):
+        params = {
+            'query_id': '9957820854288654',
+            'user_id': str(self.user_id),
+            'include_chaining': 'false',
+            'include_reel': 'true',
+            'include_suggested_users': 'false',
+            'include_logged_out_extras': 'false',
+            'include_live_status': 'false',
+            'include_highlight_reels': 'true',
+        }
+
+        response = requests.get('https://www.instagram.com/graphql/query/', params=params, cookies=self.cookies, headers=self.headers)
+
+        if response.status_code == 200:
+            response = response.json()
+            if response['extensions']['is_final']:
+                list_reels = {
+                    'status': 'ok' if response['extensions']['is_final'] else 'Error',
+                    'items': [],
+                }
+                
+                for reel in response['data']['user']['edge_highlight_reels']['edges']:
+                    list_reels['items'].append({
+                        'title': reel['node']['title'],
+                        'id': reel['node']['id'],
+                        'media': reel['node']['cover_media']['thumbnail_src'],
+                    })
+
+                return list_reels
+            else:
+                return {
+                    'status': response['extensions']['is_final']
+                }
+        else:
+            return {
+                'status': response.status_code
+            }
