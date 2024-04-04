@@ -175,7 +175,7 @@ class stalker:
                 'status': response.status_code
             }
     
-    def get_popular_history_media(self, id):
+    def get_popular_history_media(self, id): 
         data = {
         'av': '17841464967642321',
         '__d': 'www',
@@ -227,6 +227,48 @@ class stalker:
                 return {
                     'status': response['extensions']['is_final']
                 }
+        else:
+            return {
+                'status': response.status_code
+            }
+        
+    def like_post(sself, id):
+        data = {
+            'av': '17841464967642321',
+            '__d': 'www',
+            '__user': '0',
+            '__a': '1',
+            '__req': '1a',
+            '__hs': '19817.HYP:instagram_web_pkg.2.1..0.1',
+            'dpr': '1',
+            '__ccg': 'UNKNOWN',
+            '__rev': '1012543676',
+            '__s': '7ngpj6:3gf5vz:9j41li',
+            '__hsi': '7354089184669450048',
+            '__dyn': '7xeUjG1mxu1syUbFp40NonwgU7SbzEdF8aUco2qwJxS0k24o0B-q1ew65xO0FE2awpUO0n24oaEd86a3a1YwBgao6C0Mo2iyovw8OfK0EUjwGzEaE7622362W2K0zK5o4q3y1Sx-0iS2Sq2-azo7u1xwIw8O321LwTwKG1pg2Xwr86C1mwrd6goK68jDyUrAwCAyokxK',
+            '__csr': 'gtgB68IYcPH4jilhyiOQxaTT8BiQQyYymV5QTlUKRaqRWahkn-lGm-d_RGqbKUKAmCpmWLAld5CGmQVWLCiz8xuVFpUTD9AzFaz4SieybDVUixN4hkgB5gmy9oOdyEy5ojw05iexC2q2yd80Wo2Xwxx-1vhU4R0sZw1ae06SqeaBiwjk1fQ4z0i8dUc88oapsUfVU0Pu0mu0Hi1q1dgtCwGw4GU21a1GU0AK0OpE6O3228wW4EGpwEw09hG',
+            '__comet_req': '7',
+            'fb_dtsg': 'NAcP0DX85twNuM1rBIvLLEnUhU1dxISOzSZ-YQ4Ghr5vLLYiOKniNtQ:17853599968089360:1709829496',
+            'jazoest': '26246',
+            'lsd': '-60IsdBZB-MoyCjOtxEQ6P',
+            '__spin_r': '1012543676',
+            '__spin_b': 'trunk',
+            '__spin_t': '1712257318',
+            'fb_api_caller_class': 'RelayModern',
+            'fb_api_req_friendly_name': 'usePolarisLikeMediaLikeMutation',
+            'variables': f'{"media_id":"{id}"}',
+            'server_timestamps': 'true',
+            'doc_id': '6496452950454065',
+        }
+
+        response = requests.post('https://www.instagram.com/api/graphql', cookies=self.cookies, headers=self.headers, data=data)
+        
+        if response.status_code == 200:
+
+            response = response.json()
+            return {
+                'status': response['extensions']['is_final']
+            }
         else:
             return {
                 'status': response.status_code
